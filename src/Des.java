@@ -12,9 +12,7 @@ public class Des {
     final private static int TAILLE_BLOC = 64;
     final private static int TAILLE_SOUS_BLOC = 32;
     final private static int NB_RONDE = 1;
-    final private static int[] TAB_DECALAGE = {
-            1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
-    };
+    final private static int[] TAB_DECALAGE = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
 
     final private static int[] PERM_INITIALE = {
             58, 50, 42, 34, 26, 18, 10, 2,
@@ -29,7 +27,7 @@ public class Des {
 
     final private static int[][] S = {
             {14,  4, 13, 1,  2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
-            { 0, 15,  7, 4, 14,  2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8, 2, 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 50, 3, 15, 12, 8, 2, 4, 9, 175, 11, 3, 14, 10, 0, 6,133
+            {0, 15,  7, 4, 14,  2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8, 2, 4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 50, 3, 15, 12, 8, 2, 4, 9, 175, 11, 3, 14, 10, 0, 6,133
     };
     final private static int[] E = {
             32,  1,  2,  3,  4,  5,
