@@ -92,6 +92,24 @@ public class Des {
         System.arraycopy(newTab, 0, bloc, 0, newTab.length);
     }
 
+    public static int[][] decoupage(int[] bloc, int nbBlocs) {
+
+        if(bloc.length % nbBlocs == 0) {
+            int z = bloc.length / nbBlocs;
+            int [][] newTab = new int[nbBlocs][z];
+            int y = 0;
+
+            for (int i = 0; i < bloc.length ; i++) {
+                if (i % z == 0 && i > 0) {
+                    y++;
+                }
+                newTab[y][i - y * z] = i;
+            }
+            return newTab;
+        }
+        return null;
+    }
+
     private static int[] crypte(String message_clair) {
 //        int[] msg_crypte = message_clair.byt
         return null; // Todo Bouchon
