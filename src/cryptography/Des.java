@@ -6,9 +6,11 @@
 package cryptography;
 
 import java.math.BigInteger;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
+
 
 /**
  * @author Lucàs VABRE
@@ -45,29 +47,49 @@ public class Des {
         return bits;
     }
 
-    private static int[] generePermutation(int taille) {
+    public static int[] generePermutation(int taille) {
+        int[] listePermut = new int[taille];
+        ArrayList<Integer> listeIndice = new ArrayList<>();
 
-        return null; //Todo Bouchon
+        // Remplir le tableau d'indice
+        for (int i = 0; i < taille ; i++) {
+            listeIndice.add(i);
+        }
+
+        Random r = new Random();
+        for (int i = taille; i > 0 ; i--){
+            listePermut[taille- i] = listeIndice.remove(r.nextInt(0, i));
+        }
+
+        return listePermut;
     }
 
     public static String bitsToString(int[] blocs) {
 
         StringBuilder bit = new StringBuilder();
-        for (int b : blocs) {
-            bit.append(b);
+        for (int b : blocs) bit.append(b);
+
+        return new String(new BigInteger(bit.toString(), 2).toByteArray());
+    }
+
+    public static void permutation(int[] tab_permutation, int[] bloc){
+        int[] newTab = new int[bloc.length];
+
+        for(int i = 0; i < bloc.length ; i++) {
+            newTab[i] = bloc[tab_permutation[i]];
         }
 
-        System.out.println(bit);
+        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
+    }
 
-        byte[] octets = bit.toString().getBytes();
+    public static void invPermuation(int[] tab_permutation, int[] bloc) {
+        int[] newTab = new int[bloc.length];
 
-        StringBuilder message = new StringBuilder();
-        for (byte octet : octets) {
-            int charactere = Byte.toUnsignedInt(octet);
-            message.append(charactere);
+        for(int i = 0; i < bloc.length ; i++) {
+            newTab[tab_permutation[i]] = bloc[i];
         }
 
-        return message.toString();
+        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
     }
 
     private static int[] crypte(String message_clair) {
