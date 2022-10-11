@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class testDes {
 
     public static void testStringToBits() {
-        System.out.println(Arrays.toString(Des.stringToBits("Bonjour")));
+        System.out.println(Arrays.toString(Des.stringToBits("13")));
     }
 
     public static void testBitsToString() {
@@ -79,6 +79,21 @@ public class testDes {
         System.out.println(Arrays.toString(a.table_cles.get(0)));
     }
 
+    public static void testFonctionS() {
+        System.out.println(Arrays.toString(Des.fonction_S(new int[]{1, 1, 1, 1, 1, 1})));
+    }
+    public static void testFonctionF() {
+        Des des = new Des();
+
+        // System.out.println(Arrays.toString(des.fonction_F()));
+    }
+
+    private static void testCrypte() {
+        Des des = new Des();
+
+        System.out.println(Arrays.toString(des.crypte("Hello World!")));
+    }
+
     public static void main(String[] args) {
         // testStringToBits();
         // testBitsToString();
@@ -89,6 +104,11 @@ public class testDes {
         // testRecollage();
         // testDecaleGauche();
         // testXor();
-        testGenereCle();
+        // testGenereCle();
+        // testFonctionS();
+        // testFonctionF();
+        testCrypte();
+        // testDecrypte();
     }
+
 }
