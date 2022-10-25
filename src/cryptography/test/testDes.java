@@ -90,8 +90,15 @@ public class testDes {
 
     private static void testCrypte() {
         Des des = new Des();
+        int [] msg = des.crypte("Bonjour");
+        System.out.println(Arrays.toString(msg));
+        System.out.println(Des.bitsToString(msg));
+    }
 
-        System.out.println(Arrays.toString(des.crypte("Hello World!")));
+    private static void testDecrypte() {
+        Des des = new Des();
+        int[] msg =  des.crypte("Bonjour");
+        System.out.println(des.decrypte(msg));;
     }
 
     public static void main(String[] args) {
@@ -107,7 +114,7 @@ public class testDes {
         // testGenereCle();
         // testFonctionS();
         // testFonctionF();
-        testCrypte();
+         testCrypte();
         // testDecrypte();
     }
 
