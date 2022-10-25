@@ -30,6 +30,19 @@ public class Des {
             61, 53, 45, 37, 29, 21, 13, 5,
             63, 55, 47, 39, 31, 23, 15, 7
     };
+
+ /*   private static final int[] INV_PERM_INITIALE = {
+            40,8,48,16,56,24,64,32,
+            39,7,47,15,55,23,63,31,
+            38,6,46,14,54,22,62,30,
+            37,5,45,13,53,21,61,29,
+            36,4,44,12,52,20,60,28,
+            35,3,43,11,51,19,59,27,
+            34,2,42,10,50,18,58,26,
+            33,1,41,9,49,17,57,25
+    };
+*/
+
     private static final int[][] S = {
             {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
             {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
@@ -80,7 +93,7 @@ public class Des {
 
         Random r = new Random();
         for (int i = taille; i > 0; i--) {
-            listePermut[taille - i] = listeIndice.remove(r.nextInt(0, i));
+            listePermut[taille - i] = listeIndice.remove(r.nextInt(i));
         }
 
         return listePermut;
@@ -97,13 +110,14 @@ public class Des {
     public static void permutation(int[] tab_permutation, int[] bloc) {
         int[] newTab = new int[bloc.length];
         for (int i = 0; i < bloc.length; i++) {
+
             newTab[i] = bloc[tab_permutation[i] % tab_permutation.length];
         }
 
         System.arraycopy(newTab, 0, bloc, 0, newTab.length);
     }
 
-    public static void invPermuation(int[] tab_permutation, int[] bloc) {
+    public static void invPermutation(int[] tab_permutation, int[] bloc) {
         int[] newTab = new int[bloc.length];
 
         //// System.out.println(bloc.length);
@@ -139,6 +153,7 @@ public class Des {
     }
 
     public static int[] recollageBloc(int[][] blocs) {
+
         int[] bloc = new int[blocs.length * blocs[0].length];
         int y = 0;
         for (int[] ints : blocs) {
@@ -207,7 +222,7 @@ public class Des {
 
         int[] resultat = new int[4];
         for (int i = 0; i < resultat.length; i++, coordonneeInt /= 10) {
-            resultat[i] = coordonneeInt % 10;
+            resultat[resultat.length-i-1] = coordonneeInt % 10;
         }
 
         return resultat;
@@ -216,29 +231,26 @@ public class Des {
     public int[] fonction_F(int indice_cle, int[] Dn) {
         //xor entre this.E et la cle trouvé à cette ronde
         int[] cle = this.table_cles.get(indice_cle);
-        int[] newDn = new int[48];
-        for (int i = 0; i < this.E.length; i++) {
-            newDn[i] = Dn[this.E[i] % Dn.length];
+        int[] d_prime_n = new int[48];
+        for (int i = 0; i < E.length; i++) {
+            d_prime_n[i] = Dn[E[i] % Dn.length];
         }
-        int[] Dn_prime = xor(cle, newDn);
+        int[] D_etoile_n = xor(cle, d_prime_n);
 
         //découpage en 8 blocs de 6 bits
-        int[][] decoupe = decoupage(Dn_prime, 8);
+        int[][] decoupe = decoupage(D_etoile_n, 8);
         int[][] bloc = new int[8][4];
 
         for (int i = 0; i < decoupe.length; i++) {
             int[] tab = fonction_S(decoupe[i]);
             System.arraycopy(tab, 0, bloc[i], 0, tab.length);
         }
-
         return recollageBloc(bloc);
     }
 
     public int[] crypte(String message_clair) {
 
         int[] msg_bit = stringToBits(message_clair);
-        // // System.out.println(Arrays.toString(msg_bit));
-        // // System.out.println(msg_bit.length);
         int taille = (int) Math.ceil(msg_bit.length / (float) TAILLE_BLOC) * 64;
 
         int[] msgBit = new int[taille];
@@ -251,45 +263,57 @@ public class Des {
 
         int[][] decoupe = decoupage(msgBit, (int) Math.ceil(msg_bit.length / (float) TAILLE_BLOC));
 
-        int[][] msg_crypte_bit = new int[msg_bit.length / TAILLE_BLOC][TAILLE_BLOC];
+
+        int[][] msg_crypte_bit = new int[(int) Math.ceil(msg_bit.length / (float) TAILLE_BLOC)][TAILLE_BLOC];
+
 
         //Boucle de génération 16 des clés
         for (int n = 0; n < (TAILLE_BLOC / 4); n++) {
             this.genereCle(n);
         }
 
-        for (int i = 0; i < decoupe.length - 1; i++) {
+        for (int i = 0; i < decoupe.length ; i++) {
             permutation(PERM_INITIALE, decoupe[i]);
 
             int[][] decoupe2 = decoupage(decoupe[i], 2);
 
+
             for (int n = 0; n < 16; n++) {
-                int[] Gn1 = decoupe2[1];
-                int[] F = fonction_F(i, decoupe2[1]);
+                int[] Gn1 = new int[decoupe2[1].length];
+                System.arraycopy(decoupe2[1], 0, Gn1, 0, Gn1.length);
+                int[] F = fonction_F(n, decoupe2[1]);
                 decoupe2[1] = xor(decoupe2[0], F);
                 decoupe2[0] = Gn1;
             }
-            msg_crypte_bit[i] = recollageBloc(decoupe2);
-            invPermuation(PERM_INITIALE, msg_crypte_bit[i]);
-        }
 
+            msg_crypte_bit[i] = recollageBloc(decoupe2);
+            invPermutation(PERM_INITIALE, msg_crypte_bit[i]);
+        }
         return recollageBloc(msg_crypte_bit);
     }
 
     public String decrypte(int[] messageCode) {
+
 
         int[][] decoupe = decoupage(messageCode, (int) (messageCode.length / TAILLE_BLOC));
 
         for (int i = 0; i < decoupe.length; i++) {
             permutation(PERM_INITIALE, decoupe[i]);
             int[][] bloc32 = decoupage(decoupe[i], 2);
+
             for (int n = 15; n >= 0; n--) {
-                int[] dn1 = bloc32[0];
-                bloc32[0] = xor(bloc32[1], fonction_F(i, dn1));
+                int[] dn1 = new int[bloc32[0].length];
+                System.out.println("clé de chiffrement utilisé :" + Arrays.toString(this.table_cles.get(n)));
+                System.arraycopy(bloc32[0], 0, dn1, 0, dn1.length);
+                bloc32[0] = xor(bloc32[1], fonction_F(n, dn1));
                 bloc32[1] = dn1;
+                System.out.println("bloc32[0] :"+ Arrays.toString(bloc32[0]));
+                System.out.println("bloc32[1] :"+ Arrays.toString(bloc32[1]));
+
             }
             decoupe[i] = recollageBloc(bloc32);
-            invPermuation(PERM_INITIALE, decoupe[i]);
+            invPermutation(PERM_INITIALE, decoupe[i]);
+
         }
         int[] message_decrypte = recollageBloc(decoupe);
         return bitsToString(message_decrypte);

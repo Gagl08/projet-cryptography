@@ -7,7 +7,7 @@ import java.util.Arrays;
 public class testDes {
 
     public static void testStringToBits() {
-        System.out.println(Arrays.toString(Des.stringToBits("13")));
+        System.out.println(Arrays.toString(Des.stringToBits("Bonjour")));
     }
 
     public static void testBitsToString() {
@@ -46,7 +46,7 @@ public class testDes {
         System.out.println("Bloc apres permuation: ");
         System.out.println(Arrays.toString(bloc));
 
-        Des.invPermuation(permutation, bloc);
+        Des.invPermutation(permutation, bloc);
         System.out.println("Bloc après Inv-permuation: ");
         System.out.println(Arrays.toString(bloc));
 
@@ -54,11 +54,11 @@ public class testDes {
     }
 
     public static void testDecoupage() {
-        System.out.println(Arrays.deepToString(Des.decoupage(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, 4)));
+        System.out.println(Arrays.deepToString(Des.decoupage(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, 7)));
     }
 
     public static void testRecollage() {
-        int[][] decoupage = Des.decoupage(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, 4);
+        int[][] decoupage = Des.decoupage(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, 7);
 
         System.out.println(Arrays.deepToString(decoupage));
         assert decoupage != null;
@@ -85,37 +85,39 @@ public class testDes {
     public static void testFonctionF() {
         Des des = new Des();
 
-        // System.out.println(Arrays.toString(des.fonction_F()));
+//         System.out.println(Arrays.toString(des.fonction_F()));
     }
 
     private static void testCrypte() {
         Des des = new Des();
         int [] msg = des.crypte("Bonjour");
-        System.out.println(Arrays.toString(msg));
-        System.out.println(Des.bitsToString(msg));
+        System.out.println("en bit : " +Arrays.toString(msg));
+        System.out.println("en string :"+Des.bitsToString(msg));
     }
 
     private static void testDecrypte() {
         Des des = new Des();
         int[] msg =  des.crypte("Bonjour");
+        System.out.println("Message crypté : " + Des.bitsToString(msg));
         System.out.println(des.decrypte(msg));;
     }
 
     public static void main(String[] args) {
-        // testStringToBits();
-        // testBitsToString();
-        // testGenerePermutation();
-        // testPermuation();
-        // testInvPermuation();
-        // testDecoupage();
-        // testRecollage();
-        // testDecaleGauche();
-        // testXor();
-        // testGenereCle();
-        // testFonctionS();
-        // testFonctionF();
-         testCrypte();
-        // testDecrypte();
+//         testStringToBits(); //Il marche
+//         testBitsToString();//Il marche
+//         testGenerePermutation();//Il marche
+//         testPermuation();//Il marche
+//         testInvPermuation();//Il marche
+//         testDecoupage();//Il marche (même avec un nombre de bloc qui divise pas la taille du bloc de base)
+//         testRecollage();//Il marche
+//         testDecaleGauche();//Il marche
+//         testXor();//Il marche
+//         testGenereCle();// Aucune idée, ça créé une clé random mais je sais pas si c'est comme ça
+//         testFonctionS();// corrigé
+//         testFonctionF(); // il a l'air bon
+//         testCrypte(); //Il a l'air bon (si on regarde decoupe[0]et [1] à chaque itérations on voit que c'est cohérent)
+         testDecrypte(); // Un truc est normal c'est que jusqu'à la deniere itération sur les 16 ,
+        // les clés sont randoms jusqu'à la dernière itération ou elle est tout le temps la meme
     }
 
 }
