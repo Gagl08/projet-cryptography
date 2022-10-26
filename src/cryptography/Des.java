@@ -121,6 +121,7 @@ public class Des {
         // On découpe en bloc de 8bits
         int[][] blocsOfOctet = decoupage(blocs, blocs.length / 8);
 
+
         StringBuilder resultat = new StringBuilder();
         for (int[] octet : blocsOfOctet) {
             // Convertis l'octet en chaine de caractère
@@ -363,6 +364,32 @@ public class Des {
         return recollageBloc(msg_crypte_bit);
     }
 
+    /**
+     * Remove the last character if it contains only zeros
+     * @param message_decrypte
+     *
+     * @return int[] = array without the last 8 bits if they were all zeroes
+     */
+    public static int[] removeCharNull (int[] message_decrypte){
+
+        int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
+
+
+        int[] octet = blocsOfOctet[blocsOfOctet.length-1];
+        StringBuilder stringBuilderOctet = new StringBuilder();
+        for (int i : octet) stringBuilderOctet.append(i);
+        String stringOctet = stringBuilderOctet.toString();
+        int c = Integer.parseInt(stringOctet, 2);
+
+        if ((char) c == 0){
+            int[] newTab = new int[message_decrypte.length-8];
+            System.arraycopy(message_decrypte, 0, newTab, 0, newTab.length);
+            return newTab;
+        }else{
+            return message_decrypte;
+        }
+     }
+
     public String decrypte(int[] messageCode) {
         int[][] decoupe = decoupage(messageCode, messageCode.length / TAILLE_BLOC);
 
@@ -381,7 +408,8 @@ public class Des {
             invPermutation(PERM_INITIALE, decoupe[i]);
         }
         int[] message_decrypte = recollageBloc(decoupe);
-        return bitsToString(message_decrypte);
+
+        return bitsToString(removeCharNull(message_decrypte));
     }
 }
 
