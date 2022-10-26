@@ -107,7 +107,7 @@ public class testDes {
 
     private static void testDecrypte() {
         Des des = new Des();
-        int[] msg = des.crypte("Bonjour");
+        int[] msg = des.crypte("Bonjour, je suis super heureux de vous voir");
         System.out.println("Message crypté : " + Des.bitsToString(msg));
         System.out.println(des.decrypte(msg));
     }

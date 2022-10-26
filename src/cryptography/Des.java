@@ -290,20 +290,20 @@ public class Des {
 
         int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
 
+        ArrayList<Integer> msg_decrypt = new ArrayList<>();
 
-        int[] octet = blocsOfOctet[blocsOfOctet.length - 1];
-        StringBuilder stringBuilderOctet = new StringBuilder();
-        for (int i : octet) stringBuilderOctet.append(i);
-        String stringOctet = stringBuilderOctet.toString();
-        int c = Integer.parseInt(stringOctet, 2);
+        for (int[] octet: blocsOfOctet){
+            StringBuilder stringBuilderOctet = new StringBuilder();
+            for (int i : octet) stringBuilderOctet.append(i);
+            String stringOctet = stringBuilderOctet.toString();
+            int c = Integer.parseInt(stringOctet, 2);
 
-        if ((char) c == 0) {
-            int[] newTab = new int[message_decrypte.length - 8];
-            System.arraycopy(message_decrypte, 0, newTab, 0, newTab.length);
-            return newTab;
-        } else {
-            return message_decrypte;
+            if ((char) c != 0) {
+                for (int i : octet) msg_decrypt.add(i);
+            }
         }
+
+        return msg_decrypt.stream().mapToInt(i->i).toArray();
     }
 
     /* Genere */
