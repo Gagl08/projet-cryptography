@@ -5,7 +5,6 @@
  */
 package cryptography;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Random;
@@ -59,9 +58,8 @@ public class Des {
             24, 25, 26, 27, 28, 29,
             28, 29, 30, 31, 32, 1,
     };
-
-    private final int[] masterKey = new int[64];
     public ArrayList<int[]> table_cles;
+    private int[] masterKey = new int[64];
 
     public Des() {
         Random random = new Random();
@@ -71,65 +69,83 @@ public class Des {
         this.table_cles = new ArrayList<>();
     }
 
+    /**
+     * Crée un nouveau Des avec une masterKey définie (Test/Debug)
+     *
+     * @param masterKey Liste d'entiers qui définie la master key (Doit avoir une taille de 64)
+     */
+    public Des(int[] masterKey) {
+        if (masterKey.length != 64) {
+            throw new IllegalArgumentException("La masterKey n'est pas composée de 64 bits");
+        }
+
+        this.masterKey = masterKey;
+        this.table_cles = new ArrayList<>();
+    }
+
+    /* Manipulations de bits et String */
+
+    /**
+     * Converti une chaîne de caractère en sa liste de bits (conversion de caractères ascii en binaire)
+     *
+     * @param message Chaîne de caractère à convertir
+     * @return La liste de bits, resultat de la conversion du message en binaire
+     */
     public static int[] stringToBits(String message) {
-        char[] bitsInCharList = new BigInteger(message.getBytes())
-                .toString(2)
-                .toCharArray();
-        int[] bits = new int[bitsInCharList.length];
-        for (int i = 0; i < bitsInCharList.length; i++) {
-            bits[i] = Integer.parseInt(String.valueOf(bitsInCharList[i]));
+        if (message.length() == 0) return new int[]{};
+
+        ArrayList<Integer> resultat = new ArrayList<>();
+        for (char c : message.toCharArray()) {
+
+            // Ajoute au résultat la valeur du caractère en binaire
+            String binaryStringValue = Integer.toBinaryString(c);
+            String formatedStringValue = String.format("%08d", Integer.parseInt(binaryStringValue));
+            for (char bit : formatedStringValue.toCharArray()) {
+                int binaryIntValue = Character.getNumericValue(bit);
+                resultat.add(binaryIntValue);
+            }
         }
-        return bits;
+
+        return resultat.stream().mapToInt(i -> i).toArray();
     }
 
-    public static int[] generePermutation(int taille) {
-        int[] listePermut = new int[taille];
-        ArrayList<Integer> listeIndice = new ArrayList<>();
-
-        // Remplir le tableau d'indice
-        for (int i = 0; i < taille; i++) {
-            listeIndice.add(i);
-        }
-
-        Random r = new Random();
-        for (int i = taille; i > 0; i--) {
-            listePermut[taille - i] = listeIndice.remove(r.nextInt(i));
-        }
-
-        return listePermut;
-    }
-
+    /**
+     * Converti une liste de bits en chaîne de caractères
+     *
+     * @param blocs liste de bits à convertir
+     * @return La chaine de caractère
+     */
     public static String bitsToString(int[] blocs) {
+        if (blocs.length == 0) return "";
 
-        StringBuilder bit = new StringBuilder();
-        for (int b : blocs) bit.append(b);
+        // On découpe en bloc de 8bits
+        int[][] blocsOfOctet = decoupage(blocs, blocs.length / 8);
 
-        return new String(new BigInteger(bit.toString(), 2).toByteArray());
-    }
+        StringBuilder resultat = new StringBuilder();
+        for (int[] octet : blocsOfOctet) {
+            // Convertis l'octet en chaine de caractère
+            // Ex: [0, 1, 1, 0, 0, 0, 0, 1] -> "01100001"
+            StringBuilder stringBuilderOctet = new StringBuilder();
+            for (int i : octet) stringBuilderOctet.append(i);
+            String stringOctet = stringBuilderOctet.toString();
 
-    public static void permutation(int[] tab_permutation, int[] bloc) {
-        int[] newTab = new int[bloc.length];
-        for (int i = 0; i < bloc.length; i++) {
+            // On convertis la chaine de caractère en entier (base 2 -> 10)
+            int c = Integer.parseInt(stringOctet, 2);
 
-            newTab[i] = bloc[tab_permutation[i] % tab_permutation.length];
+            // On convertis l'entier en caractère et on l'ajoute au message final résultat
+            resultat.append((char) c);
         }
 
-        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
+        return resultat.toString();
     }
 
-    public static void invPermutation(int[] tab_permutation, int[] bloc) {
-        int[] newTab = new int[bloc.length];
-
-        //// System.out.println(bloc.length);
-        for (int i = 0; i < bloc.length; i++) {
-            //// System.out.println(tab_permutation[i] % tab_permutation.length);
-
-            newTab[tab_permutation[i] % tab_permutation.length] = bloc[i];
-        }
-
-        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
-    }
-
+    /**
+     * Découpe un liste de bits en nbBlocs
+     *
+     * @param bloc    Liste de bits
+     * @param nbBlocs Nombre de bloc demandé
+     * @return Une liste de bloc contenant le même nombre de bits
+     */
     public static int[][] decoupage(int[] bloc, int nbBlocs) {
         int surplu = bloc.length % nbBlocs;
         int z = (bloc.length) / nbBlocs;
@@ -150,6 +166,29 @@ public class Des {
             newTab[y][i - y * z] = bloc[i];
         }
         return newTab;
+    }
+
+    /**
+     * Effectue un OU exclusif entre deux liste de bits.
+     * Rappel:
+     * <ul>
+     *     <li>0 XOR 0 -> 0</li>
+     *     <li>0 XOR 1 -> 1</li>
+     *     <li>1 XOR 0 -> 1</li>
+     *     <li>1 XOR 1 -> 0</li>
+     * </ul>
+     *
+     * @param tab1 Première liste de bits
+     * @param tab2 Seconde liste de bits
+     * @return Le résultat du OU exclusif entre tab1 et tab2
+     */
+    public static int[] xor(int[] tab1, int[] tab2) {
+        int[] resultat = new int[tab1.length];
+        for (int i = 0; i < resultat.length; i++) {
+            resultat[i] = (tab1[i] + tab2[i]) % 2;
+        }
+
+        return resultat;
     }
 
     public static int[] recollageBloc(int[][] blocs) {
@@ -177,38 +216,48 @@ public class Des {
         return newBloc;
     }
 
-    public static int[] xor(int[] tab1, int[] tab2) {
-        int[] resultat = new int[tab1.length];
-        // System.out.println(resultat.length);
+    /* Permutations */
+    public static void permutation(int[] tab_permutation, int[] bloc) {
+        int[] newTab = new int[bloc.length];
+        for (int i = 0; i < bloc.length; i++) {
 
-        for (int i = 0; i < resultat.length; i++) {
-            resultat[i] = (tab1[i] + tab2[i]) % 2;
+            newTab[i] = bloc[tab_permutation[i] % tab_permutation.length];
         }
 
-        return resultat;
+        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
     }
 
-    public void genereCle(int n) {
-        int[] newCle = new int[56];
-        int[] lastCle = new int[48];
-        int[] permInit = generePermutation(newCle.length);
-        permutation(permInit, newCle);
+    public static void invPermutation(int[] tab_permutation, int[] bloc) {
+        int[] newTab = new int[bloc.length];
 
-        System.arraycopy(this.masterKey, 0, newCle, 0, newCle.length);
+        //// System.out.println(bloc.length);
+        for (int i = 0; i < bloc.length; i++) {
+            //// System.out.println(tab_permutation[i] % tab_permutation.length);
 
-        int[][] cleDecoupe = decoupage(newCle, 2);
-        assert cleDecoupe != null;
-        cleDecoupe[0] = decaleGauche(cleDecoupe[0], TAB_DECALAGE[n]);
-        cleDecoupe[1] = decaleGauche(cleDecoupe[1], TAB_DECALAGE[n]);
+            newTab[tab_permutation[i] % tab_permutation.length] = bloc[i];
+        }
 
-        newCle = recollageBloc(cleDecoupe);
-
-        int[] lastPerm = generePermutation(lastCle.length);
-        System.arraycopy(newCle, 0, lastCle, 0, lastCle.length);
-        permutation(lastPerm, lastCle);
-        this.table_cles.add(lastCle);
+        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
     }
 
+    public static int[] generePermutation(int taille) {
+        int[] listePermut = new int[taille];
+        ArrayList<Integer> listeIndice = new ArrayList<>();
+
+        // Remplir le tableau d'indice
+        for (int i = 0; i < taille; i++) {
+            listeIndice.add(i);
+        }
+
+        Random r = new Random();
+        for (int i = taille; i > 0; i--) {
+            listePermut[taille - i] = listeIndice.remove(r.nextInt(i));
+        }
+
+        return listePermut;
+    }
+
+    /* Fonctions */
     public static int[] fonction_S(int[] tab) {
 
         String l = "" + tab[0] + tab[5];
@@ -226,6 +275,27 @@ public class Des {
         }
 
         return resultat;
+    }
+
+    /* Genere */
+    public void genereCle(int n) {
+        int[] newCle = new int[56];
+        int[] lastCle = new int[48];
+        int[] permInit = generePermutation(newCle.length);
+        permutation(permInit, newCle);
+
+        System.arraycopy(this.masterKey, 0, newCle, 0, newCle.length);
+
+        int[][] cleDecoupe = decoupage(newCle, 2);
+        cleDecoupe[0] = decaleGauche(cleDecoupe[0], TAB_DECALAGE[n]);
+        cleDecoupe[1] = decaleGauche(cleDecoupe[1], TAB_DECALAGE[n]);
+
+        newCle = recollageBloc(cleDecoupe);
+
+        int[] lastPerm = generePermutation(lastCle.length);
+        System.arraycopy(newCle, 0, lastCle, 0, lastCle.length);
+        permutation(lastPerm, lastCle);
+        this.table_cles.add(lastCle);
     }
 
     public int[] fonction_F(int indice_cle, int[] Dn) {
@@ -248,6 +318,7 @@ public class Des {
         return recollageBloc(bloc);
     }
 
+    /* Methodes générales */
     public int[] crypte(String message_clair) {
 
         int[] msg_bit = stringToBits(message_clair);
@@ -293,9 +364,7 @@ public class Des {
     }
 
     public String decrypte(int[] messageCode) {
-
-
-        int[][] decoupe = decoupage(messageCode, (int) (messageCode.length / TAILLE_BLOC));
+        int[][] decoupe = decoupage(messageCode, messageCode.length / TAILLE_BLOC);
 
         for (int i = 0; i < decoupe.length; i++) {
             permutation(PERM_INITIALE, decoupe[i]);
@@ -313,7 +382,6 @@ public class Des {
             }
             decoupe[i] = recollageBloc(bloc32);
             invPermutation(PERM_INITIALE, decoupe[i]);
-
         }
         int[] message_decrypte = recollageBloc(decoupe);
         return bitsToString(message_decrypte);
