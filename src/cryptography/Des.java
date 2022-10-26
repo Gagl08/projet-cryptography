@@ -222,7 +222,7 @@ public class Des {
 
         int[] resultat = new int[4];
         for (int i = 0; i < resultat.length; i++, coordonneeInt /= 10) {
-            resultat[resultat.length-i-1] = coordonneeInt % 10;
+            resultat[resultat.length - i - 1] = coordonneeInt % 10;
         }
 
         return resultat;
@@ -272,7 +272,7 @@ public class Des {
             this.genereCle(n);
         }
 
-        for (int i = 0; i < decoupe.length ; i++) {
+        for (int i = 0; i < decoupe.length; i++) {
             permutation(PERM_INITIALE, decoupe[i]);
 
             int[][] decoupe2 = decoupage(decoupe[i], 2);
@@ -307,8 +307,8 @@ public class Des {
                 System.arraycopy(bloc32[0], 0, dn1, 0, dn1.length);
                 bloc32[0] = xor(bloc32[1], fonction_F(n, dn1));
                 bloc32[1] = dn1;
-                System.out.println("bloc32[0] :"+ Arrays.toString(bloc32[0]));
-                System.out.println("bloc32[1] :"+ Arrays.toString(bloc32[1]));
+                System.out.println("bloc32[0] :" + Arrays.toString(bloc32[0]));
+                System.out.println("bloc32[1] :" + Arrays.toString(bloc32[1]));
 
             }
             decoupe[i] = recollageBloc(bloc32);
