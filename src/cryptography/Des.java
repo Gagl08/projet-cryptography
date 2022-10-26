@@ -372,12 +372,9 @@ public class Des {
 
             for (int n = 15; n >= 0; n--) {
                 int[] dn1 = new int[bloc32[0].length];
-                System.out.println("clé de chiffrement utilisé :" + Arrays.toString(this.table_cles.get(n)));
                 System.arraycopy(bloc32[0], 0, dn1, 0, dn1.length);
                 bloc32[0] = xor(bloc32[1], fonction_F(n, dn1));
                 bloc32[1] = dn1;
-                System.out.println("bloc32[0] :" + Arrays.toString(bloc32[0]));
-                System.out.println("bloc32[1] :" + Arrays.toString(bloc32[1]));
 
             }
             decoupe[i] = recollageBloc(bloc32);
