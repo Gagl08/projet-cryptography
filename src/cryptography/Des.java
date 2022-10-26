@@ -186,7 +186,7 @@ public class Des {
     public static int[] xor(int[] tab1, int[] tab2) {
         int[] resultat = new int[tab1.length];
         for (int i = 0; i < resultat.length; i++) {
-            resultat[i] = (tab1[i] + tab2[i]) % 2;
+            resultat[i] = tab1[i] ^ tab2[i];
         }
 
         return resultat;
@@ -278,6 +278,32 @@ public class Des {
         return resultat;
     }
 
+    /**
+     * Remove the last character if it contains only zeros
+     *
+     * @param message_decrypte
+     * @return int[] = array without the last 8 bits if they were all zeroes
+     */
+    public static int[] removeCharNull(int[] message_decrypte) {
+
+        int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
+
+
+        int[] octet = blocsOfOctet[blocsOfOctet.length - 1];
+        StringBuilder stringBuilderOctet = new StringBuilder();
+        for (int i : octet) stringBuilderOctet.append(i);
+        String stringOctet = stringBuilderOctet.toString();
+        int c = Integer.parseInt(stringOctet, 2);
+
+        if ((char) c == 0) {
+            int[] newTab = new int[message_decrypte.length - 8];
+            System.arraycopy(message_decrypte, 0, newTab, 0, newTab.length);
+            return newTab;
+        } else {
+            return message_decrypte;
+        }
+    }
+
     /* Genere */
     public void genereCle(int n) {
         int[] newCle = new int[56];
@@ -363,32 +389,6 @@ public class Des {
         }
         return recollageBloc(msg_crypte_bit);
     }
-
-    /**
-     * Remove the last character if it contains only zeros
-     * @param message_decrypte
-     *
-     * @return int[] = array without the last 8 bits if they were all zeroes
-     */
-    public static int[] removeCharNull (int[] message_decrypte){
-
-        int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
-
-
-        int[] octet = blocsOfOctet[blocsOfOctet.length-1];
-        StringBuilder stringBuilderOctet = new StringBuilder();
-        for (int i : octet) stringBuilderOctet.append(i);
-        String stringOctet = stringBuilderOctet.toString();
-        int c = Integer.parseInt(stringOctet, 2);
-
-        if ((char) c == 0){
-            int[] newTab = new int[message_decrypte.length-8];
-            System.arraycopy(message_decrypte, 0, newTab, 0, newTab.length);
-            return newTab;
-        }else{
-            return message_decrypte;
-        }
-     }
 
     public String decrypte(int[] messageCode) {
         int[][] decoupe = decoupage(messageCode, messageCode.length / TAILLE_BLOC);

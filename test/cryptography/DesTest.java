@@ -1,8 +1,6 @@
 package cryptography;
 
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -22,6 +20,7 @@ class DesTest {
 //    }
 
     @Test
+    @DisplayName("stringToBits")
     void stringToBits() {
         HashMap<String, int[]> TESTS = new HashMap<>() {{
             // Empty string
@@ -159,6 +158,7 @@ class DesTest {
     }
 
     @Test
+    @DisplayName("stringToBits")
     void bitsToString() {
         HashMap<int[], String> TESTS = new HashMap<>() {{
             // Empty string
@@ -296,62 +296,84 @@ class DesTest {
     }
 
     @Test
+    @DisplayName("decoupage")
     void decoupage() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("generePermutation")
     void generePermutation() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("permutation")
     void permutation() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("invPermutation")
     void invPermutation() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("recollageBloc")
     void recollageBloc() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("decaleGauche")
     void decaleGauche() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
-    void xor() {
-        assertTrue(false); // TODO
-    }
-
-    @Test
+    @DisplayName("genereCle")
     void genereCle() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("fonction_S")
     void fonction_S() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("fonction_F")
     void fonction_F() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("crypte")
     void crypte() {
-        assertTrue(false); // TODO
+        fail(); // TODO
     }
 
     @Test
+    @DisplayName("decrypte")
     void decrypte() {
-        assertTrue(false); // TODO
+        fail(); // TODO
+    }
+
+    @Test
+    @DisplayName("xor")
+    void xor() {
+        final int[][][] TESTS = {
+                {
+                        {0, 1, 0, 1}, // Table 1
+                        {0, 0, 1, 1}, // Table 2
+                        {0, 1, 1, 0}, // Result expected
+                },
+        };
+
+        for (int[][] test : TESTS) {
+            assertArrayEquals(Des.xor(test[0], test[1]), test[2]);
+        }
     }
 }
