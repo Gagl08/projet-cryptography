@@ -1,5 +1,5 @@
 /*
- * cryptography.Des.java, 13/09/2022
+ * Des.java, 13/09/2022
  * INU Champollion 2022-2023, L3 INFO
  * pas de copyright, aucun droits
  */
@@ -11,7 +11,9 @@ import java.util.Random;
 
 
 /**
- * @author Lucàs VABRE et les 2 autres
+ * @author Gaël BURGUÈS
+ * @author Laurian DUFRECHOU
+ * @author Lucàs VABRE
  */
 public class Des {
 

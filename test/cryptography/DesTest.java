@@ -1,23 +1,25 @@
+/*
+ * DesTest.java, 26/10/2022
+ * INU Champollion 2022-2023, L3 INFO
+ * pas de copyright, aucun droits
+ */
 package cryptography;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @author Gaël BURGUÈS
+ * @author Laurian DUFRECHOU
+ * @author Lucàs VABRE
+ */
 class DesTest {
-
-//    @BeforeEach
-//    void setUp() {
-//
-//    }
-//
-//    @AfterEach
-//    void tearDown() {
-//    }
 
     @Test
     @DisplayName("stringToBits")
@@ -153,7 +155,7 @@ class DesTest {
 
         for (Map.Entry<String, int[]> test : TESTS.entrySet()) {
             assertArrayEquals(test.getValue(), Des.stringToBits(test.getKey()));
-            System.out.println(test.getKey() + " -> Ok");
+            System.out.printf("\"%s\" -> OK\n", test.getKey());
         }
     }
 
@@ -291,7 +293,29 @@ class DesTest {
 
         for (Map.Entry<int[], String> test : TESTS.entrySet()) {
             assertEquals(test.getValue(), Des.bitsToString(test.getKey()));
-            System.out.println(test.getValue() + " -> Ok");
+            System.out.printf("\"%s\" -> OK\n", test.getValue());
+        }
+    }
+
+    @Test
+    @DisplayName("xor")
+    void xor() {
+
+        final int[][][] TESTS = {
+                {
+                        {0, 1, 0, 1}, // Table 1
+                        {0, 0, 1, 1}, // Table 2
+                        {0, 1, 1, 0}, // Result expected
+                },
+        };
+
+        for (int[][] test : TESTS) {
+            assertArrayEquals(Des.xor(test[0], test[1]), test[2]);
+            System.out.printf(
+                    "%s XOR %s -> OK\n",
+                    Arrays.toString(test[0]),
+                    Arrays.toString(test[1])
+            );
         }
     }
 
@@ -359,21 +383,5 @@ class DesTest {
     @DisplayName("decrypte")
     void decrypte() {
         fail(); // TODO
-    }
-
-    @Test
-    @DisplayName("xor")
-    void xor() {
-        final int[][][] TESTS = {
-                {
-                        {0, 1, 0, 1}, // Table 1
-                        {0, 0, 1, 1}, // Table 2
-                        {0, 1, 1, 0}, // Result expected
-                },
-        };
-
-        for (int[][] test : TESTS) {
-            assertArrayEquals(Des.xor(test[0], test[1]), test[2]);
-        }
     }
 }
