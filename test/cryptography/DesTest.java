@@ -300,7 +300,7 @@ class DesTest {
     @Test
     @DisplayName("xor")
     void xor() {
-
+        
         final int[][][] TESTS = {
                 {
                         {0, 1, 0, 1}, // Table 1
@@ -322,66 +322,103 @@ class DesTest {
     @Test
     @DisplayName("decoupage")
     void decoupage() {
-        fail(); // TODO
-    }
+        HashMap<int[][], int[][]> TESTS = new HashMap<>() {{
+            // TODO add more tests
+            put(
+                    new int[][]{
+                            new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, // bloc
+                            new int[]{7}  // nbBloc
+                    },
+                    new int[][]{        // expected result
+                            new int[]{0, 1, 2},
+                            new int[]{3, 4, 5},
+                            new int[]{6, 7, 8},
+                            new int[]{9, 10, 11},
+                            new int[]{12, 13, 14},
+                            new int[]{15, 16, 17},
+                            new int[]{18, 19, 0}
+                    }
+            );
+        }};
 
-    @Test
-    @DisplayName("generePermutation")
-    void generePermutation() {
-        fail(); // TODO
-    }
-
-    @Test
-    @DisplayName("permutation")
-    void permutation() {
-        fail(); // TODO
-    }
-
-    @Test
-    @DisplayName("invPermutation")
-    void invPermutation() {
-        fail(); // TODO
+        for (Map.Entry<int[][], int[][]> test : TESTS.entrySet()) {
+            assertArrayEquals(test.getValue(), Des.decoupage(test.getKey()[0], test.getKey()[1][0]));
+            System.out.printf("(%s, %s) -> OK\n", Arrays.toString(test.getKey()[0]), test.getKey()[1][0]);
+        }
     }
 
     @Test
     @DisplayName("recollageBloc")
     void recollageBloc() {
-        fail(); // TODO
+        HashMap<int[][], int[]> TESTS = new HashMap<>() {{
+            // TODO add more tests
+            put(
+                    new int[][]{
+                            new int[]{1, 2, 3, 4, 5},
+                            new int[]{6, 7, 8, 9, 10},
+                    },
+                    new int[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+            );
+        }};
+
+        for (Map.Entry<int[][], int[]> test : TESTS.entrySet()) {
+            assertArrayEquals(test.getValue(), Des.recollageBloc(test.getKey()));
+            System.out.printf("%s -> OK\n", Arrays.deepToString(test.getKey()));
+        }
+
     }
 
     @Test
     @DisplayName("decaleGauche")
     void decaleGauche() {
-        fail(); // TODO
+        fail("Not yet implemented"); // TODO
+    }
+
+    @Test
+    @DisplayName("generePermutation")
+    void generePermutation() {
+        fail("Not yet implemented"); // TODO
+    }
+
+    @Test
+    @DisplayName("permutation")
+    void permutation() {
+        fail("Not yet implemented"); // TODO
+    }
+
+    @Test
+    @DisplayName("invPermutation")
+    void invPermutation() {
+        fail("Not yet implemented"); // TODO
     }
 
     @Test
     @DisplayName("genereCle")
     void genereCle() {
-        fail(); // TODO
+        fail("Not yet implemented"); // TODO
     }
 
     @Test
     @DisplayName("fonction_S")
     void fonction_S() {
-        fail(); // TODO
+        fail("Not yet implemented"); // TODO
     }
 
     @Test
     @DisplayName("fonction_F")
     void fonction_F() {
-        fail(); // TODO
+        fail("Not yet implemented"); // TODO
     }
 
     @Test
     @DisplayName("crypte")
     void crypte() {
-        fail(); // TODO
+        fail("Not yet implemented"); // TODO
     }
 
     @Test
     @DisplayName("decrypte")
     void decrypte() {
-        fail(); // TODO
+        fail("Not yet implemented"); // TODO
     }
 }

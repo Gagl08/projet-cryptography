@@ -17,7 +17,7 @@ import java.util.Random;
  */
 public class Des {
 
-    private static final int TAILLE_BLOC = 64;
+    public static final int TAILLE_BLOC = 64;
     private static final int TAILLE_SOUS_BLOC = 32;
     private static final int NB_ROUND = 1;
     private static final int[] TAB_DECALAGE = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
@@ -51,9 +51,6 @@ public class Des {
             {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}
     };
 */
-    
-    private ArrayList<int[][]> table_S;
-
     private static final int[] E = {
             32, 1, 2, 3, 4, 5,
             4, 5, 6, 7, 8, 9,
@@ -65,6 +62,7 @@ public class Des {
             28, 29, 30, 31, 32, 1,
     };
     public ArrayList<int[]> table_cles;
+    private final ArrayList<int[][]> table_S;
     private int[] masterKey = new int[64];
 
     public Des() {
@@ -264,6 +262,32 @@ public class Des {
         return listePermut;
     }
 
+    /**
+     * Remove the last character if it contains only zeros
+     *
+     * @param message_decrypte
+     * @return int[] = array without the last 8 bits if they were all zeroes
+     */
+    public static int[] removeCharNull(int[] message_decrypte) {
+
+        int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
+
+        ArrayList<Integer> msg_decrypt = new ArrayList<>();
+
+        for (int[] octet : blocsOfOctet) {
+            StringBuilder stringBuilderOctet = new StringBuilder();
+            for (int i : octet) stringBuilderOctet.append(i);
+            String stringOctet = stringBuilderOctet.toString();
+            int c = Integer.parseInt(stringOctet, 2);
+
+            if ((char) c != 0) {
+                for (int i : octet) msg_decrypt.add(i);
+            }
+        }
+
+        return msg_decrypt.stream().mapToInt(i -> i).toArray();
+    }
+
     /* Fonctions */
     public int[] fonction_S(int[] tab, int index_S) {
 
@@ -282,32 +306,6 @@ public class Des {
         }
 
         return resultat;
-    }
-
-    /**
-     * Remove the last character if it contains only zeros
-     *
-     * @param message_decrypte
-     * @return int[] = array without the last 8 bits if they were all zeroes
-     */
-    public static int[] removeCharNull(int[] message_decrypte) {
-
-        int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
-
-        ArrayList<Integer> msg_decrypt = new ArrayList<>();
-
-        for (int[] octet: blocsOfOctet){
-            StringBuilder stringBuilderOctet = new StringBuilder();
-            for (int i : octet) stringBuilderOctet.append(i);
-            String stringOctet = stringBuilderOctet.toString();
-            int c = Integer.parseInt(stringOctet, 2);
-
-            if ((char) c != 0) {
-                for (int i : octet) msg_decrypt.add(i);
-            }
-        }
-
-        return msg_decrypt.stream().mapToInt(i->i).toArray();
     }
 
     /* Genere */
@@ -335,15 +333,15 @@ public class Des {
 
         int[][] newS = new int[4][16];
         Random random = new Random();
-        for (int i = 0; i< 4 ; i++){
-            ArrayList<Integer> liste_valeurs = new ArrayList<>(Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15));
-            for (int y = 0; y<16 ; y++){
+        for (int i = 0; i < 4; i++) {
+            ArrayList<Integer> liste_valeurs = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+            for (int y = 0; y < 16; y++) {
                 int index = random.nextInt(liste_valeurs.size());
                 newS[i][y] = liste_valeurs.get(index);
                 liste_valeurs.remove(index);
             }
         }
-        this.table_S.add(n,newS);
+        this.table_S.add(n, newS);
     }
 
     public int[] fonction_F(int indice_cle, int[] Dn) {

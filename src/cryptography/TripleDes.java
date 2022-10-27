@@ -2,10 +2,26 @@ package cryptography;
 
 public class TripleDes {
 
-    private final Des[] listeDes;
+    private static final int NB_DES = 3;
+    private final Des[] listeDes = new Des[NB_DES];
 
     public TripleDes() {
-        this.listeDes = new Des[]{new Des(), new Des(), new Des(),};
+        for (int i = 0; i < NB_DES; i++) {
+            listeDes[i] = new Des();
+        }
+    }
+
+    public TripleDes(int[][] masterKeys) {
+        if (masterKeys.length != NB_DES)
+            throw new IllegalArgumentException("masterKeys parameter should have 3 elements");
+        for (int[] masterKey : masterKeys) {
+            if (masterKey.length != Des.TAILLE_BLOC)
+                throw new IllegalArgumentException("Each elements in masterKeys should have 64 bits");
+        }
+
+        for (int i = 0; i < NB_DES; i++) {
+            listeDes[i] = new Des(masterKeys[i]);
+        }
     }
 
     public int[] crypte(String messageClair) {
