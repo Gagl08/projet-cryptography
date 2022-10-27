@@ -89,7 +89,7 @@ public class testDes {
     }
 
     public static void testFonctionS() {
-        System.out.println(Arrays.toString(Des.fonction_S(new int[]{1, 1, 1, 1, 1, 1})));
+//        System.out.println(Arrays.toString(Des.fonction_S(new int[]{1, 1, 1, 1, 1, 1})));
     }
 
     public static void testFonctionF() {

@@ -44,12 +44,16 @@ public class Des {
     };
 */
 
-    private static final int[][] S = {
+   /* private static final int[][] S = {
             {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
             {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
             {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
             {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}
     };
+*/
+    
+    private ArrayList<int[][]> table_S;
+
     private static final int[] E = {
             32, 1, 2, 3, 4, 5,
             4, 5, 6, 7, 8, 9,
@@ -69,6 +73,7 @@ public class Des {
             this.masterKey[i] = random.nextInt(2);
         }
         this.table_cles = new ArrayList<>();
+        this.table_S = new ArrayList<>();
     }
 
     /**
@@ -83,6 +88,7 @@ public class Des {
 
         this.masterKey = masterKey;
         this.table_cles = new ArrayList<>();
+        this.table_S = new ArrayList<>();
     }
 
     /* Manipulations de bits et String */
@@ -233,9 +239,7 @@ public class Des {
     public static void invPermutation(int[] tab_permutation, int[] bloc) {
         int[] newTab = new int[bloc.length];
 
-        //// System.out.println(bloc.length);
         for (int i = 0; i < bloc.length; i++) {
-            //// System.out.println(tab_permutation[i] % tab_permutation.length);
 
             newTab[tab_permutation[i] % tab_permutation.length] = bloc[i];
         }
@@ -261,7 +265,7 @@ public class Des {
     }
 
     /* Fonctions */
-    public static int[] fonction_S(int[] tab) {
+    public int[] fonction_S(int[] tab, int index_S) {
 
         String l = "" + tab[0] + tab[5];
         int ligne = Integer.parseInt(l, 2);
@@ -269,7 +273,7 @@ public class Des {
         int colonne = Integer.parseInt(c, 2);
 
         // chaque blocs de 6 bits on fait le truc avec bit 1 et bit 6 et l'autre truc pour avoir ligne et colonne de S
-        String coordonneeStr = Integer.toString(S[ligne][colonne], 2);
+        String coordonneeStr = Integer.toString(this.table_S.get(index_S)[ligne][colonne], 2);
         int coordonneeInt = Integer.parseInt(coordonneeStr);
 
         int[] resultat = new int[4];
@@ -327,6 +331,21 @@ public class Des {
         this.table_cles.add(lastCle);
     }
 
+    public void genereS(int n) {
+
+        int[][] newS = new int[4][16];
+        Random random = new Random();
+        for (int i = 0; i< 4 ; i++){
+            ArrayList<Integer> liste_valeurs = new ArrayList<>(Arrays.asList(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15));
+            for (int y = 0; y<16 ; y++){
+                int index = random.nextInt(liste_valeurs.size());
+                newS[i][y] = liste_valeurs.get(index);
+                liste_valeurs.remove(index);
+            }
+        }
+        this.table_S.add(n,newS);
+    }
+
     public int[] fonction_F(int indice_cle, int[] Dn) {
         //xor entre this.E et la cle trouvé à cette ronde
         int[] cle = this.table_cles.get(indice_cle);
@@ -341,7 +360,7 @@ public class Des {
         int[][] bloc = new int[8][4];
 
         for (int i = 0; i < decoupe.length; i++) {
-            int[] tab = fonction_S(decoupe[i]);
+            int[] tab = fonction_S(decoupe[i], i);
             System.arraycopy(tab, 0, bloc[i], 0, tab.length);
         }
         return recollageBloc(bloc);
@@ -370,6 +389,7 @@ public class Des {
         //Boucle de génération 16 des clés
         for (int n = 0; n < (TAILLE_BLOC / 4); n++) {
             this.genereCle(n);
+            this.genereS(n);
         }
 
         for (int i = 0; i < decoupe.length; i++) {
