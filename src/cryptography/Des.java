@@ -65,6 +65,9 @@ public class Des {
     public ArrayList<int[]> table_cles;
     private int[] masterKey = new int[64];
 
+    /**
+     * Crée un nouveau Des avec une masterKey aléatoire
+     */
     public Des() {
         Random random = new Random();
         for (int i = 0; i < masterKey.length; i++)
@@ -91,7 +94,7 @@ public class Des {
     /* Manipulations de bits et String */
 
     /**
-     * Converti une chaîne de caractère en sa liste de bits (conversion de caractères ascii en binaire)
+     * Convertis une chaîne de caractère en sa liste de bits (conversion de caractères ascii en binaire)
      *
      * @param message Chaîne de caractère à convertir
      * @return La liste de bits, resultat de la conversion du message en binaire
@@ -197,6 +200,12 @@ public class Des {
         return resultat;
     }
 
+    /**
+     * Recole une liste de blocs en un seul bloc
+     *
+     * @param blocs La liste de bloc à recoller
+     * @return La liste une fois recollée
+     */
     public static int[] recollageBloc(int[][] blocs) {
 
         int[] bloc = new int[blocs.length * blocs[0].length];
@@ -211,6 +220,13 @@ public class Des {
         return bloc;
     }
 
+    /**
+     * Décalle vers la gauche les bits d'un bloc
+     *
+     * @param blocs  Le bloc initial (à modifier)
+     * @param nbCran Le le nombre décalage à apporter
+     * @return Le bloc une fois décalé
+     */
     public static int[] decaleGauche(int[] blocs, int nbCran) {
         int[] newBloc = new int[blocs.length];
 
@@ -222,7 +238,13 @@ public class Des {
         return newBloc;
     }
 
-    /* Permutations */
+    /**
+     * Déplace les bits d'un blocs par rapport à un tableau de permutation
+     *
+     * @param tableauPermutation Tableau contenant la liste des indices de manière non ordonnée
+     * @param bloc               Le bloc a permuté
+     * @return Le bloc une fois permutée
+     */
     public static int[] permutation(int[] tableauPermutation, int[] bloc) {
         if (tableauPermutation.length != bloc.length)
             throw new IllegalArgumentException("tableauPermutation et bloc n'ont pas la même taille");
@@ -236,6 +258,13 @@ public class Des {
         return resultat;
     }
 
+    /**
+     * Inverse la permuation
+     *
+     * @param tableauPermutation Tableau contenant la liste des indices de manière non ordonnées
+     * @param bloc               Le bloc qui a été permuté
+     * @return La valeur initiale du bloc (annule la permutation)
+     */
     public static int[] invPermutation(int[] tableauPermutation, int[] bloc) {
         if (tableauPermutation.length != bloc.length)
             throw new IllegalArgumentException("tableauPermutation et bloc n'ont pas la même taille");
@@ -248,6 +277,13 @@ public class Des {
         return resultat;
     }
 
+    /**
+     * Génère aléatoirement un tableau de permuation d'une taille définie
+     * (il n'y a pas de doublons et toutes les valeurs sont positives)
+     *
+     * @param taille Entier qui définis la taille du tableau à générer
+     * @return Le tableau de permutation une fois générée
+     */
     public static int[] generePermutation(int taille) {
         int[] listePermut = new int[taille];
         ArrayList<Integer> listeIndice = new ArrayList<>();
@@ -268,12 +304,12 @@ public class Des {
     /**
      * Remove the last character if it contains only zeros
      *
-     * @param message_decrypte
+     * @param messageDecrypte Tableau de bit qui possède des caractères nulls
      * @return int[] = array without the last 8 bits if they were all zeroes
      */
-    public static int[] removeCharNull(int[] message_decrypte) {
+    public static int[] removeCharNull(int[] messageDecrypte) {
 
-        int[][] blocsOfOctet = decoupage(message_decrypte, message_decrypte.length / 8);
+        int[][] blocsOfOctet = decoupage(messageDecrypte, messageDecrypte.length / 8);
 
         ArrayList<Integer> msg_decrypt = new ArrayList<>();
 
@@ -291,27 +327,39 @@ public class Des {
         return msg_decrypt.stream().mapToInt(i -> i).toArray();
     }
 
-    /* Fonctions */
-    public int[] fonction_S(int[] tab, int index_S) {
+    /**
+     * Calcul de la fonction S
+     *
+     * @param tab     Tableau
+     * @param indiceS Indice
+     * @return Le résultat de la fonction S
+     */
+    public int[] fonction_S(int[] tab, int indiceS) {
 
-        String l = "" + tab[0] + tab[5];
-        int ligne = Integer.parseInt(l, 2);
-        String c = "" + tab[1] + tab[2] + tab[3] + tab[4];
-        int colonne = Integer.parseInt(c, 2);
+        String ligneStr = String.format("%d%d", tab[0], tab[5]);
+        String colonneStr = String.format("%d%d%d%d", tab[1], tab[2], tab[3], tab[4]);
+
+        int ligne = Integer.parseInt(ligneStr, 2);
+        int colonne = Integer.parseInt(colonneStr, 2);
 
         // chaque blocs de 6 bits on fait le truc avec bit 1 et bit 6 et l'autre truc pour avoir ligne et colonne de S
-        String coordonneeStr = Integer.toString(this.table_S.get(index_S)[ligne][colonne], 2);
-        int coordonneeInt = Integer.parseInt(coordonneeStr);
+        String coordonneeStr = Integer.toString(this.table_S.get(indiceS)[ligne][colonne], 2);
+        int coordonnee = Integer.parseInt(coordonneeStr);
 
         int[] resultat = new int[4];
-        for (int i = 0; i < resultat.length; i++, coordonneeInt /= 10) {
-            resultat[resultat.length - i - 1] = coordonneeInt % 10;
-        }
+        for (int i = 0; i < resultat.length; i++, coordonnee /= 10)
+            resultat[resultat.length - i - 1] = coordonnee % 10;
 
         return resultat;
     }
 
-    /* Genere */
+    /**
+     * Calcule la clé de la n ième ronde.
+     * Stocke la clée dans tab_clés
+     *
+     * @param n La ronde de la clé à calculer
+     * @return La clée calculée
+     */
     public int[][] genereCle(int n) {
         int[] newCle = new int[56];
         int[] lastCle = new int[48];
@@ -339,19 +387,26 @@ public class Des {
         int[][] newS = new int[4][16];
         Random random = new Random();
         for (int i = 0; i < 4; i++) {
-            ArrayList<Integer> liste_valeurs = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
+            ArrayList<Integer> listeValeurs = new ArrayList<>(Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15));
             for (int y = 0; y < 16; y++) {
-                int index = random.nextInt(liste_valeurs.size());
-                newS[i][y] = liste_valeurs.get(index);
-                liste_valeurs.remove(index);
+                int index = random.nextInt(listeValeurs.size());
+                newS[i][y] = listeValeurs.get(index);
+                listeValeurs.remove(index);
             }
         }
         this.table_S.add(n, newS);
     }
 
-    public int[] fonction_F(int indice_cle, int[] Dn) {
+    /**
+     * Calcul de la fonction F
+     *
+     * @param indiceCle Indice
+     * @param Dn        Tableau Dn
+     * @return
+     */
+    public int[] fonction_F(int indiceCle, int[] Dn) {
         //xor entre this.E et la cle trouvé à cette ronde
-        int[] cle = this.table_cles.get(indice_cle);
+        int[] cle = this.table_cles.get(indiceCle);
         int[] d_prime_n = new int[48];
         for (int i = 0; i < E.length; i++) {
             d_prime_n[i] = Dn[E[i] % Dn.length];
@@ -369,52 +424,56 @@ public class Des {
         return recollageBloc(bloc);
     }
 
-    /* Methodes générales */
-    public int[] crypte(String message_clair) {
+    /**
+     * Crypte un message
+     *
+     * @param messageClair Chaine de caractère à crypter (attention uniquement des caractères ascii)
+     * @return Le message crypté en binaire
+     */
+    public int[] crypte(String messageClair) {
 
-        int[] msg_bit = stringToBits(message_clair);
-        int taille = (int) Math.ceil(msg_bit.length / (float) TAILLE_BLOC) * 64;
+        int[] messageBinaire = stringToBits(messageClair);
+        int taille = (int) Math.ceil(messageBinaire.length / (float) TAILLE_BLOC);
 
-        int[] msgBit = new int[taille];
-        Arrays.fill(msgBit, 0);
+        // Crée un tableau de taille fixe avec le messageBinaire (l'espace vide est comblé par des bits 0)
+        int[] messageBinaireTailleFixe = new int[taille * TAILLE_BLOC];
+        Arrays.fill(messageBinaireTailleFixe, 0);
+        System.arraycopy(messageBinaire, 0, messageBinaireTailleFixe, 0, messageBinaire.length);
 
-        // boucle du XOR
-        for (int y = 0; y < msg_bit.length; y++) {
-            msgBit[y] = (msgBit[y] + msg_bit[y]) % 2;
-        }
-
-        int[][] decoupe = decoupage(msgBit, (int) Math.ceil(msg_bit.length / (float) TAILLE_BLOC));
-
-
-        int[][] msg_crypte_bit = new int[(int) Math.ceil(msg_bit.length / (float) TAILLE_BLOC)][TAILLE_BLOC];
-
+        int[][] decoupe = decoupage(messageBinaireTailleFixe, taille);
+        int[][] messageBinaireCrypte = new int[taille][TAILLE_BLOC];
 
         //Boucle de génération 16 des clés
-        for (int n = 0; n < (TAILLE_BLOC / 4); n++) {
-            this.genereCle(n);
-            this.genereS(n);
-        }
+        for (int n = 0;
+             n < (TAILLE_BLOC / 4);
+             this.genereCle(n), this.genereS(n), n++)
+            ; // Empty body
 
         for (int i = 0; i < decoupe.length; i++) {
             permutation(PERM_INITIALE, decoupe[i]);
 
-            int[][] decoupe2 = decoupage(decoupe[i], 2);
-
+            int[][] secondeDecoupe = decoupage(decoupe[i], 2);
 
             for (int n = 0; n < 16; n++) {
-                int[] Gn1 = new int[decoupe2[1].length];
-                System.arraycopy(decoupe2[1], 0, Gn1, 0, Gn1.length);
-                int[] F = fonction_F(n, decoupe2[1]);
-                decoupe2[1] = xor(decoupe2[0], F);
-                decoupe2[0] = Gn1;
+                int[] Gn1 = new int[secondeDecoupe[1].length];
+                System.arraycopy(secondeDecoupe[1], 0, Gn1, 0, Gn1.length);
+                int[] F = fonction_F(n, secondeDecoupe[1]);
+                secondeDecoupe[1] = xor(secondeDecoupe[0], F);
+                secondeDecoupe[0] = Gn1;
             }
 
-            msg_crypte_bit[i] = recollageBloc(decoupe2);
-            invPermutation(PERM_INITIALE, msg_crypte_bit[i]);
+            messageBinaireCrypte[i] = recollageBloc(secondeDecoupe);
+            invPermutation(PERM_INITIALE, messageBinaireCrypte[i]);
         }
-        return recollageBloc(msg_crypte_bit);
+        return recollageBloc(messageBinaireCrypte);
     }
 
+    /**
+     * Décrypte un message
+     *
+     * @param messageCode Message encrypté en binaire
+     * @return Le message décrypté
+     */
     public String decrypte(int[] messageCode) {
         int[][] decoupe = decoupage(messageCode, messageCode.length / TAILLE_BLOC);
 
@@ -432,9 +491,9 @@ public class Des {
             decoupe[i] = recollageBloc(bloc32);
             invPermutation(PERM_INITIALE, decoupe[i]);
         }
-        int[] message_decrypte = recollageBloc(decoupe);
+        int[] messageDecrypte = recollageBloc(decoupe);
 
-        return bitsToString(removeCharNull(message_decrypte));
+        return bitsToString(removeCharNull(messageDecrypte));
     }
 }
 

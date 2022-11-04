@@ -426,7 +426,6 @@ class DesTest {
     @Test
     void genereCle() {
         for (Des des : FIXTURE) {
-            System.out.println(des);
             // 1 élément généré
             assertEquals(1, des.genereCle(1).length);
 
