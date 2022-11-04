@@ -437,25 +437,24 @@ class DesTest {
 
     @Test
     void fonction_S() {
-        // TODO
-        Des des = new Des();
+        for (Des des : FIXTURE) {
+            des.genereS(0);
 
-        des.genereS(0);
-        int resultat_attendu_int = des.tableS.get(3).get(9);
+            String coordonneeStr = Integer.toString(des.table_S.get(0)[3][9], 2);
+            int resultat_attendu_int = Integer.parseInt(coordonneeStr);
 
-        int[] resultat_attendu = new int[4];
-        for (int i = 0; i < resultat_attendu.length; i++, resultat_attendu_int /= 10) {
-            resultat_attendu[resultat_attendu.length - i - 1] = resultat_attendu_int % 10;
+            int[] resultat_attendu = new int[4];
+            for (int i = 0; i < resultat_attendu.length; i++, resultat_attendu_int /= 10)
+                resultat_attendu[resultat_attendu.length - i - 1] = resultat_attendu_int % 10;
+
+            assertArrayEquals(resultat_attendu, des.fonction_S(new int[]{1, 1, 0, 0, 1, 1}, 0));
         }
-
-
-        assertArrayEquals(resultat_attendu, des.fonction_S(new int[] {1,1,0,0,1,1}));
-
     }
 
     @Test
     void fonction_F() {
-        // System.out.println(Arrays.toString(des.fonction_F(1, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17})));
+        // Impossible à tester, dépend fortement du Random
+//        System.out.println(Arrays.toString(des.fonction_F(1, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17})));
     }
 
     @Test
