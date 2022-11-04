@@ -89,13 +89,12 @@ public class testDes {
     }
 
     public static void testFonctionS() {
-//        System.out.println(Arrays.toString(Des.fonction_S(new int[]{1, 1, 1, 1, 1, 1})));
+        //System.out.println(Arrays.toString(Des.fonction_S(new int[]{1, 1, 1, 1, 1, 1})));
     }
 
     public static void testFonctionF() {
-        Des des = new Des();
-
-//         System.out.println(Arrays.toString(des.fonction_F()));
+        //Des des = new Des();
+        //System.out.println(Arrays.toString(des.fonction_F()));
     }
 
     private static void testCrypte() {

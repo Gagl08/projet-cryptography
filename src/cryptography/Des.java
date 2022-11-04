@@ -44,13 +44,13 @@ public class Des {
     };
 */
 
-   /* private static final int[][] S = {
-            {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
-            {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
-            {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
-            {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}
-    };
-*/
+    /* private static final int[][] S = {
+             {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
+             {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
+             {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
+             {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}
+     };
+ */
     private static final int[] E = {
             32, 1, 2, 3, 4, 5,
             4, 5, 6, 7, 8, 9,
@@ -61,15 +61,14 @@ public class Des {
             24, 25, 26, 27, 28, 29,
             28, 29, 30, 31, 32, 1,
     };
-    public ArrayList<int[]> table_cles;
     private final ArrayList<int[][]> table_S;
+    public ArrayList<int[]> table_cles;
     private int[] masterKey = new int[64];
 
     public Des() {
         Random random = new Random();
-        for (int i = 0; i < masterKey.length; i++) {
+        for (int i = 0; i < masterKey.length; i++)
             this.masterKey[i] = random.nextInt(2);
-        }
         this.table_cles = new ArrayList<>();
         this.table_S = new ArrayList<>();
     }
@@ -224,25 +223,29 @@ public class Des {
     }
 
     /* Permutations */
-    public static void permutation(int[] tab_permutation, int[] bloc) {
-        int[] newTab = new int[bloc.length];
-        for (int i = 0; i < bloc.length; i++) {
+    public static int[] permutation(int[] tableauPermutation, int[] bloc) {
+        if (tableauPermutation.length != bloc.length)
+            throw new IllegalArgumentException("tableauPermutation et bloc n'ont pas la même taille");
 
-            newTab[i] = bloc[tab_permutation[i] % tab_permutation.length];
+        int[] resultat = new int[bloc.length];
+        for (int i = 0; i < bloc.length; i++) {
+            resultat[i] = bloc[tableauPermutation[i] % tableauPermutation.length];
         }
 
-        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
+        System.arraycopy(resultat, 0, bloc, 0, resultat.length);
+        return resultat;
     }
 
-    public static void invPermutation(int[] tab_permutation, int[] bloc) {
-        int[] newTab = new int[bloc.length];
+    public static int[] invPermutation(int[] tableauPermutation, int[] bloc) {
+        if (tableauPermutation.length != bloc.length)
+            throw new IllegalArgumentException("tableauPermutation et bloc n'ont pas la même taille");
 
+        int[] resultat = new int[bloc.length];
         for (int i = 0; i < bloc.length; i++) {
-
-            newTab[tab_permutation[i] % tab_permutation.length] = bloc[i];
+            resultat[tableauPermutation[i] % tableauPermutation.length] = bloc[i];
         }
-
-        System.arraycopy(newTab, 0, bloc, 0, newTab.length);
+        System.arraycopy(resultat, 0, bloc, 0, resultat.length);
+        return resultat;
     }
 
     public static int[] generePermutation(int taille) {
@@ -309,7 +312,7 @@ public class Des {
     }
 
     /* Genere */
-    public void genereCle(int n) {
+    public int[][] genereCle(int n) {
         int[] newCle = new int[56];
         int[] lastCle = new int[48];
         int[] permInit = generePermutation(newCle.length);
@@ -327,6 +330,8 @@ public class Des {
         System.arraycopy(newCle, 0, lastCle, 0, lastCle.length);
         permutation(lastPerm, lastCle);
         this.table_cles.add(lastCle);
+
+        return table_cles.toArray(new int[][]{});
     }
 
     public void genereS(int n) {

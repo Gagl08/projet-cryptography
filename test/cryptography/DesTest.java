@@ -5,12 +5,15 @@
  */
 package cryptography;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Gaël BURGUÈS
@@ -18,6 +21,51 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @author Lucàs VABRE
  */
 class DesTest {
+
+    private final ArrayList<Des> FIXTURE = new ArrayList<>();
+
+    @BeforeEach
+    public void init() {
+        int[][] MASTER_KEYS = {{
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0,
+        }, {
+                1, 0, 0, 0, 0, 0, 0, 0,
+                0, 1, 0, 0, 0, 0, 0, 0,
+                0, 0, 1, 0, 0, 0, 0, 0,
+                0, 0, 0, 1, 0, 0, 0, 0,
+                0, 0, 0, 0, 1, 0, 0, 0,
+                0, 0, 0, 0, 0, 1, 0, 0,
+                0, 0, 0, 0, 0, 0, 1, 0,
+                0, 0, 0, 0, 0, 0, 0, 1,
+        }, {
+                1, 0, 1, 0, 1, 0, 1, 0,
+                0, 1, 0, 1, 0, 1, 0, 1,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                0, 1, 0, 1, 0, 1, 0, 1,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                0, 1, 0, 1, 0, 1, 0, 1,
+                1, 0, 1, 0, 1, 0, 1, 0,
+                0, 1, 0, 1, 0, 1, 0, 1,
+        }, {
+                1, 1, 0, 1, 1, 1, 0, 1,
+                0, 0, 0, 1, 0, 0, 0, 1,
+                0, 0, 0, 1, 1, 0, 1, 1,
+                1, 1, 1, 0, 1, 0, 1, 1,
+                1, 0, 0, 1, 1, 1, 1, 1,
+                1, 1, 0, 0, 0, 1, 0, 0,
+                0, 0, 0, 0, 1, 0, 1, 1,
+                0, 0, 1, 1, 1, 0, 1, 1,
+        }};
+
+        for (int[] masterKey : MASTER_KEYS) FIXTURE.add(new Des(masterKey));
+    }
 
     @Test
     void stringToBits() {
@@ -297,92 +345,124 @@ class DesTest {
 
     @Test
     void decaleGauche() {
-        // TODO
-        System.out.println(Arrays.toString(Des.decaleGauche(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, 4)));
+        assertArrayEquals(new int[]{0, 0, 1, 0}, Des.decaleGauche(new int[]{0, 0, 0, 1}, 1));
+        assertArrayEquals(new int[]{0, 1, 0, 0}, Des.decaleGauche(new int[]{0, 0, 0, 1}, 2));
+        assertArrayEquals(new int[]{0, 0, 0, 1}, Des.decaleGauche(new int[]{0, 0, 0, 1}, 4));
+        assertArrayEquals(new int[]{0, 1, 0, 0}, Des.decaleGauche(new int[]{0, 0, 0, 1}, 10));
+
+        assertArrayEquals(
+                new int[]{4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 0, 1, 2, 3},
+                Des.decaleGauche(new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19}, 4)
+        );
     }
 
     @Test
     void generePermutation() {
-        // TODO
-        System.out.println(Arrays.toString(Des.generePermutation(64)));
+        // Longueur de la permuation
+        assertEquals(64, Des.generePermutation(64).length);
+
+        /* Utilisation d'ensemble pour détecter la présence d'éléments, de doublons, etc... */
+        int[] unePermuation = Des.generePermutation(64);
+
+        Set<Integer> ensemblePermutation = new HashSet<>();
+        for (int valeur : unePermuation) ensemblePermutation.add(valeur);
+
+        // Pas de Doublons
+        assertEquals(ensemblePermutation.size(), unePermuation.length);
+
+        // contiens les éléments de 0 a n-1 (n est la longueur de la liste)
+        for (int i = 0; i < unePermuation.length; i++) {
+            assertTrue(ensemblePermutation.contains(i));
+        }
+
+        // Ne contiens pas n (la longueur de la liste)
+        assertFalse(ensemblePermutation.contains(64));
     }
 
     @Test
     void permutation() {
-        // TODO
-        int[] permutation = Des.generePermutation(64);
-        int[] bloc = new int[permutation.length];
+        // Erreur si les tailles des paramètres ne sont pas les mêmes
+        assertThrows(IllegalArgumentException.class, () -> Des.permutation(new int[]{1, 2}, new int[]{0, 1, 2, 3, 4, 5}));
+        assertThrows(IllegalArgumentException.class, () -> Des.permutation(new int[]{0, 1, 2, 3, 4, 5}, new int[]{1, 2}));
 
-        for (int i = 0; i < bloc.length; i++) {
-            bloc[i] = i;
-        }
-        System.out.println(Arrays.toString(bloc));
-        Des.permutation(permutation, bloc);
-        System.out.println(Arrays.toString(bloc));
+        // Test de la longueur du résultat
+        assertEquals(5, Des.permutation(new int[]{0, 1, 2, 3, 4}, new int[]{0, 1, 2, 3, 4}).length);
+
+        // Test de permuation simple
+        assertArrayEquals(new int[]{1, 5, 3, 4, 2, 0}, Des.permutation(
+                new int[]{1, 5, 3, 4, 2, 0},
+                new int[]{0, 1, 2, 3, 4, 5}
+        ));
+
+        // Test de permutation complexe
+        assertArrayEquals(new int[]{2, 0, 1, 5, 4, 3}, Des.permutation(
+                new int[]{1, 5, 3, 4, 2, 0},
+                new int[]{3, 2, 4, 1, 5, 0}
+        ));
     }
 
     @Test
     void invPermutation() {
-        // TODO
-        int[] permutation = Des.generePermutation(64);
-        int[] bloc = new int[permutation.length];
-        int[] bloc2 = new int[permutation.length];
-        for (int i = 0; i < bloc.length; i++) {
-            bloc[i] = i;
-            bloc2[i] = i;
-        }
+        // Erreur si les tailles des paramètres ne sont pas les mêmes
+        assertThrows(IllegalArgumentException.class, () -> Des.invPermutation(new int[]{1, 2}, new int[]{0, 1, 2, 3, 4, 5}));
+        assertThrows(IllegalArgumentException.class, () -> Des.invPermutation(new int[]{0, 1, 2, 3, 4, 5}, new int[]{1, 2}));
 
-        System.out.println("Bloc avant permuation: ");
-        System.out.println(Arrays.toString(bloc));
+        // Test de la longueur du résultat
+        assertEquals(5, Des.invPermutation(new int[]{0, 1, 2, 3, 4}, new int[]{0, 1, 2, 3, 4}).length);
 
-        Des.permutation(permutation, bloc);
-        System.out.println("Bloc apres permuation: ");
-        System.out.println(Arrays.toString(bloc));
+        // Test de permuation simple
+        assertArrayEquals(new int[]{0, 1, 2, 3, 4, 5}, Des.invPermutation(
+                new int[]{1, 5, 3, 4, 2, 0},
+                new int[]{1, 5, 3, 4, 2, 0}
+        ));
 
-        Des.invPermutation(permutation, bloc);
-        System.out.println("Bloc après Inv-permuation: ");
-        System.out.println(Arrays.toString(bloc));
-
-        System.out.println(Arrays.equals(bloc, bloc2));
+        // Test de permutation complexe
+        assertArrayEquals(new int[]{3, 2, 4, 1, 5, 0}, Des.invPermutation(
+                new int[]{1, 5, 3, 4, 2, 0},
+                new int[]{2, 0, 1, 5, 4, 3}
+        ));
     }
 
     @Test
     void genereCle() {
-        // TODO
-        Des a = new Des();
-        a.genereCle(1);
-        System.out.println(Arrays.toString(a.table_cles.get(0)));
+        for (Des des : FIXTURE) {
+            System.out.println(des);
+            // 1 élément généré
+            assertEquals(1, des.genereCle(1).length);
+
+            // Premier élément est composé de 48 éléments
+            assertEquals(48, des.genereCle(1)[0].length);
+        }
     }
 
     @Test
     void fonction_S() {
         // TODO
         Des des = new Des();
-        //System.out.println(Arrays.toString(des.fonction_S(new int[]{1, 1, 1, 1, 1, 1}, 1)));
+        int[][] S = {
+                {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
+                {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
+                {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
+                {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}
+        };
+
+
+        // assertArrayEquals(<attendu>, des.fonction_S(...))
+
     }
 
     @Test
     void fonction_F() {
-        // TODO
-        Des des = new Des();
-        //System.out.println(Arrays.toString(des.fonction_F(1, )));
+        // System.out.println(Arrays.toString(des.fonction_F(1, new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17})));
     }
 
     @Test
-    void crypte() {
-        // TODO
-        Des des = new Des();
-        int[] msg = des.crypte("Bonjour");
-        System.out.println("en bit : " + Arrays.toString(msg));
-        System.out.println("en string :" + Des.bitsToString(msg));
-    }
-
-    @Test
-    void decrypte() {
-        // TODO
-        Des des = new Des();
-        int[] msg = des.crypte("Bonjour, je suis super heureux de vous voir");
-        System.out.println("Message crypté : " + Des.bitsToString(msg));
-        System.out.println(des.decrypte(msg));
+    @DisplayName("crypte() & decrypte()")
+    void crypteDecrypte() {
+        for (Des des : FIXTURE) {
+            String message = "Hello World!";
+            int[] messageCrypte = des.crypte(message);
+            assertEquals(message, des.decrypte(messageCrypte));
+        }
     }
 }
