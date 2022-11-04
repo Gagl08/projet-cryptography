@@ -439,15 +439,17 @@ class DesTest {
     void fonction_S() {
         // TODO
         Des des = new Des();
-        int[][] S = {
-                {14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
-                {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
-                {4, 1, 14, 8, 13, 6, 2, 11, 15, 12, 9, 7, 3, 10, 5, 0},
-                {15, 12, 8, 2, 4, 9, 1, 7, 5, 11, 3, 14, 10, 0, 6, 13}
-        };
+
+        des.genereS(0);
+        int resultat_attendu_int = des.tableS.get(3).get(9);
+
+        int[] resultat_attendu = new int[4];
+        for (int i = 0; i < resultat_attendu.length; i++, resultat_attendu_int /= 10) {
+            resultat_attendu[resultat_attendu.length - i - 1] = resultat_attendu_int % 10;
+        }
 
 
-        // assertArrayEquals(<attendu>, des.fonction_S(...))
+        assertArrayEquals(resultat_attendu, des.fonction_S(new int[] {1,1,0,0,1,1}));
 
     }
 
