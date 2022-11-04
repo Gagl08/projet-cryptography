@@ -23,5 +23,3 @@
 Give a ⭐️ if this project helped you!
 
 ***
-
-[//]: # (_This README was generated with ❤️ by [readme-md-generator]&#40;https://github.com/kefranabg/readme-md-generator&#41;_)
