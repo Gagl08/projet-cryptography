@@ -2,7 +2,7 @@
 <p>
 </p>
 
-> DES(Data Encryption Standard) library in Java
+> DES(Data Encryption Standard) in Java
 
 ## Author
 
@@ -17,9 +17,5 @@
 👤 **Lucàs VABRE**
 
 * Github: [@LucasVbr](https://github.com/LucasVbr)
-
-## Show your support
-
-Give a ⭐️ if this project helped you!
 
 ***
